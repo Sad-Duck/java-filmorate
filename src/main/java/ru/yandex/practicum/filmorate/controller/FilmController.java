@@ -12,18 +12,19 @@ import java.util.HashMap;
 
 @Slf4j
 @RestController
+@RequestMapping("/films")
 public class FilmController {
     private final HashMap<Integer, Film> films = new HashMap<>();
     private int id = 1;
     private static final LocalDate FIRST_FILM_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
-    @GetMapping("/films")
+    @GetMapping
     public Collection<Film> getFilms() {
         log.info("получен GET запрос в /films");
         return films.values();
     }
 
-    @PostMapping("/films")
+    @PostMapping
     public Film createFilm(@RequestBody Film film) {
         log.info("получен POST запрос в /films");
         if (validate(film)) {
@@ -37,7 +38,7 @@ public class FilmController {
         }
     }
 
-    @PutMapping("/films")
+    @PutMapping
     public Film updateFilm(@RequestBody Film film) {
         log.info("получен PUT запрос в /films");
         if (films.containsKey(film.getId())) {

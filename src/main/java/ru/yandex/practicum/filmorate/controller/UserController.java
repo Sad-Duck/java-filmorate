@@ -12,17 +12,18 @@ import java.util.HashMap;
 
 @Slf4j
 @RestController
+@RequestMapping("/users")
 public class UserController {
     private final HashMap<Integer, User> users = new HashMap<>();
     private int id = 1;
 
-    @GetMapping("/users")
+    @GetMapping
     public Collection<User> getUsers() {
         log.info("получен GET запрос в /users");
         return users.values();
     }
 
-    @PostMapping("/users")
+    @PostMapping
     public User createUser(@RequestBody User user) {
         log.info("получен POST запрос в /users");
         if (validate(user)) {
@@ -39,7 +40,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("/users")
+    @PutMapping
     public User updateUser(@RequestBody User user) {
         log.info("получен PUT запрос в /users");
         if (users.containsKey(user.getId())) {

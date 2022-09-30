@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotValidException;
@@ -54,10 +55,10 @@ public class FilmService {
     }
 
     protected void validate(Film film) {
-        if (film.getName().isBlank()) {
+        if (StringUtils.isBlank(film.getName())) {
             throw new NotValidException("Имя фильма неверное");
         }
-        if (film.getDescription().length() > 200) {
+        if (film.getDescription() == null || film.getDescription().length() > 200) {
             throw new NotValidException("Описание слишком длинное");
         }
         if (film.getReleaseDate().isBefore(FIRST_FILM_RELEASE_DATE)) {

@@ -62,8 +62,12 @@ public class UserService {
         if ((userStorage.get(userId)) == null || (userStorage.get(friendId)) == null) {
             throw new NotFoundException("Пользователь не найден");
         }
-        userStorage.get(userId).getFriendIds().remove(friendId);
-        userStorage.get(friendId).getFriendIds().remove(userId);
+        if (userStorage.get(userId).getFriendIds().contains(friendId)) {
+            userStorage.get(userId).getFriendIds().remove(friendId);
+            userStorage.get(friendId).getFriendIds().remove(userId);
+        } else {
+            throw new NotFoundException("Друг, которого требовалось удалить не обнаружен");
+        }
     }
 
     public ArrayList<User> getMutualFriends(long userId, long otherId) {

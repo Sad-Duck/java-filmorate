@@ -24,7 +24,6 @@ public class FilmService {
     public FilmService(Storage<Film> storage, Storage<User> userStorage) {
         this.storage = storage;
         this.userStorage = userStorage;
-
     }
 
     public Film create(Film film) {

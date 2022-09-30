@@ -12,9 +12,9 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User extends StorageData {
-    String email;
-    String login;
-    String name;
-    LocalDate birthday;
+    private String email;
+    private String login;
+    private String name;
+    private LocalDate birthday;
     private Set<Long> friendIds = new HashSet<>();
 }

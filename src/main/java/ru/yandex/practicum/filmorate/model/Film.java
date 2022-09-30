@@ -12,10 +12,10 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Film extends StorageData {
-    String name;
-    String description;
-    LocalDate releaseDate;
-    int duration;
+    private String name;
+    private String description;
+    private LocalDate releaseDate;
+    private int duration;
     private Set<Long> userIds = new HashSet<>();
     private long rate = 0;
 

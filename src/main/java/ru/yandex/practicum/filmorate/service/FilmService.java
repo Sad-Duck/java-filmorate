@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 public class FilmService {
     private static final LocalDate FIRST_FILM_RELEASE_DATE = LocalDate.of(1895, 12, 28);
     private long counter = 0L;
-    Storage<Film> storage;
-    Storage<User> userStorage;
+    private final Storage<Film> storage;
+    private final Storage<User> userStorage;
     private static final Comparator<Film> FILM_COMPARATOR = (o1, o2) -> Integer.compare(o2.getUserIds().size(), o1.getUserIds().size());
 
     @Autowired

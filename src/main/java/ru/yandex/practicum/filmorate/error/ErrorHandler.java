@@ -15,7 +15,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFound(NotFoundException e) {
-        log.info("404 {}", e.getMessage());
+        log.error("404 {}", e.getMessage());
         return new ErrorResponse("Not found ", e.getMessage());
     }
 
@@ -23,14 +23,14 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleNotValid(NotValidException e) {
-        log.info("400 {}", e.getMessage());
+        log.error("400 {}", e.getMessage());
         return new ErrorResponse("Data not valid ", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(Throwable e) {
-        log.info("500 {}", e.getMessage());
+        log.error("500 {}", e.getMessage());
         return new ErrorResponse("Exception: ", e.getMessage());
     }
 

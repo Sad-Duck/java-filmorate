@@ -61,7 +61,7 @@ public class FilmService {
         if (film.getDescription() == null || film.getDescription().length() > 200) {
             throw new NotValidException("Описание слишком длинное");
         }
-        if (film.getReleaseDate().isBefore(FIRST_FILM_RELEASE_DATE)) {
+        if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(FIRST_FILM_RELEASE_DATE)) {
             throw new NotValidException("Дата выхода неверна");
         }
         if (film.getDuration() <= 0) {

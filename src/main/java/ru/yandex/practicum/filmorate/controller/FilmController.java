@@ -27,13 +27,13 @@ public class FilmController {
         return service.create(film);
     }
 
-    @PutMapping()
+    @PutMapping
     public Film update(@RequestBody Film film) {
         log.info("Запрос на обновление фильма, id {}", film.getId());
         return service.update(film);
     }
 
-    @GetMapping()
+    @GetMapping
     public List<Film> getAll() {
         final List<Film> films = service.getAll();
         log.info("Получен запрос списка фильмов {}", films.size());

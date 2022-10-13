@@ -2,64 +2,79 @@ package ru.yandex.practicum.filmorate.controller;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.NotValidException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final HashMap<Integer, User> users = new HashMap<>();
-    private int id = 1;
+
+    private final UserService service;
+
+    @Autowired
+    public UserController(UserService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public Collection<User> getUsers() {
-        log.info("получен GET запрос в /users");
-        return users.values();
+        final List<User> users = service.getAll();
+        log.info("Получен запрос списка пользователей {}", users.size());
+        return users;
+    }
+
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable long id) {
+        log.info("Получен запрос пользователя по id: {}", id);
+        return service.get(id);
     }
 
     @PostMapping
     public User createUser(@RequestBody User user) {
-        log.info("получен POST запрос в /users");
-        if (validate(user)) {
-            if (user.getName() == null) {
-                user.setName(user.getLogin());
-            }
-            user.setId(id++);
-            users.put(user.getId(), user);
-            log.info("Добавили пользователя {}", user);
-            return user;
-        } else {
-            log.error("Входящие данные не прошли валидацию");
-            throw new NotValidException("Входящие данные не прошли валидацию");
-        }
+        log.info("Запрос на добавление пользователя, id {}", user.getId());
+        return service.create(user);
     }
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        log.info("получен PUT запрос в /users");
-        if (users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
-            log.info("Обновили пользователя " + user.getLogin());
-        } else {
-            log.error("Id пользователя не найдено");
-            throw new NotFoundException("Id пользователя не найдено");
-        }
-        return user;
+        log.info("Запрос на обновление пользователя, id {}", user.getId());
+        return service.update(user);
     }
 
-    private boolean validate(User user) {
-        return user.getEmail() != null &&
-                user.getEmail().contains("@") &&
-                !user.getLogin().contains(" ") &&
-                !user.getLogin().isBlank() &&
-                !user.getBirthday().isAfter(LocalDate.now());
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public Collection<User> getMutualFriends(@PathVariable long id, @PathVariable long otherId) {
+        log.info("Запрос на получение общих друзей у {} и {}", id, otherId);
+        return service.getMutualFriends(id, otherId);
     }
 
+    @GetMapping("/{id}/friends")
+    public Collection<User> getFriends(@PathVariable long id) {
+        log.info("Запрос на получение друзей у {}", id);
+        return service.findFriends(id);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        log.info("Запрос на удаление друга {} от {}", friendId, id);
+        service.removeFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}")
+    public void removeUser(@PathVariable Long id) {
+        log.info("Запрос на удаление пользователя {}", id);
+        service.delete(id);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        log.info("Запрос на добавления в друзья {} от {}", friendId, id);
+        service.addFriend(id, friendId);
+    }
 }
+

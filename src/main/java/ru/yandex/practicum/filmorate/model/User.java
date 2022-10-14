@@ -16,5 +16,6 @@ public class User extends StorageData {
     private String login;
     private String name;
     private LocalDate birthday;
-    private Set<Long> friendIds = new HashSet<>();
+    private Set<Long> confirmedFriendIds = new HashSet<>();
+    private Set<Long> notConfirmedFriendIds = new HashSet<>();
 }

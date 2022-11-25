@@ -5,15 +5,12 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Mpa {
-    private Integer id;
-    private Rating rating;
+public class Mpa extends StorageData {
+    private String name;
+
+    public Mpa(Long id, String name) {
+        super(id);
+        this.name = name;
+    }
 }
 
-enum Rating {
-    G,
-    PG,
-    PG_13,
-    R,
-    NC_17
-}

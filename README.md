@@ -10,7 +10,7 @@
 
 ```
 SELECT *
-FROM FILM;
+FROM FILMS;
 ```
 
 * Получение списка пользователей
@@ -24,8 +24,8 @@ FROM USERS;
 
 ```
 SELECT *
-FROM FILM AS f
-INNER JOIN ratings AS r ON r.rating_id = f.rating_id
-WHERE r.rating = 'R'
+FROM FILMS AS f
+         INNER JOIN MPA ON MPA.mpa_id = f.mpa_id
+WHERE MPA.rating = 'R'
 ORDER BY f.duration
 ```

@@ -56,7 +56,7 @@ public class UserController {
     @GetMapping("/{id}/friends")
     public Collection<User> getFriends(@PathVariable long id) {
         log.info("Запрос на получение друзей у {}", id);
-        return service.findFriends(id);
+        return service.getFriends(id);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")

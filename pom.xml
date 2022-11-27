@@ -15,19 +15,22 @@
 	<description>9th sprint project</description>
 	<properties>
 		<java.version>11</java.version>
+		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
+		<javax.el.version>3.0.0</javax.el.version>
+		<commons-lang3.version>3.12.0</commons-lang3.version>
 	</properties>
 	<dependencies>
 
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>8.0.0.Final</version>
+			<version>${hibernate-validator.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.el</artifactId>
-			<version>3.0.0</version>
+			<version>${javax.el.version}</version>
 		</dependency>
 
 		<dependency>
@@ -50,7 +53,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.12.0</version>
+			<version>${commons-lang3.version}</version>
 		</dependency>
 
 		<dependency>

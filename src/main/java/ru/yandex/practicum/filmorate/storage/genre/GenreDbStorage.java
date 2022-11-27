@@ -40,7 +40,9 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public List<Genre> getGenresByFilm(long filmId) {
-        String sqlQuery = "SELECT * FROM genres WHERE GENRE_ID IN (SELECT GENRE_ID FROM FILM_GENRES WHERE FILM_ID = ?)";
+        String sqlQuery = "SELECT * FROM genres " +
+                "LEFT OUTER JOIN FILM_GENRES FG on GENRES.GENRE_ID = FG.GENRE_ID " +
+                "WHERE FILM_ID = ?";
         try {
             return jdbcTemplate.query(sqlQuery, GenreDbStorage::makeGenre, filmId);
         } catch (DataAccessException e) {

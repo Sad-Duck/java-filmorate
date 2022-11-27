@@ -39,7 +39,7 @@ public class MpaDbStorage implements MpaStorage {
 
     @Override
     public Mpa getMpaByFilm(long filmId) {
-        String sqlQuery = "SELECT * FROM mpa WHERE mpa_id IN (SELECT mpa_id FROM films WHERE film_id = ?)";
+        String sqlQuery = "SELECT * FROM MPA LEFT OUTER JOIN FILMS F ON MPA.MPA_ID = F.MPA_ID WHERE FILM_ID = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, MpaDbStorage::makeMpa, filmId);
         } catch (DataAccessException e) {

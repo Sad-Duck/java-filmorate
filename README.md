@@ -3,6 +3,7 @@
 ## Модель базы данных
 
 ![model](DBD.png)
+https://app.quickdatabasediagrams.com/#/d/NB6hL2
 
 #### Пример запросов:
 

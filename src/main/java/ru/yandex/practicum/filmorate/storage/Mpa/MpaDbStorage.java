@@ -38,29 +38,6 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     @Override
-    public Mpa create(Mpa data) {
-        String sqlQuery = "INSERT INTO mpa(rating) " +
-                "VALUES (?)";
-        jdbcTemplate.update(sqlQuery,
-                data.getName());
-        return data;
-    }
-
-    @Override
-    public Mpa update(Mpa data) {
-        String sql = "UPDATE mpa SET rating = ? WHERE mpa_id = ?";
-        jdbcTemplate.update(sql,
-                data.getName(), data.getId());
-        return data;
-    }
-
-    @Override
-    public void delete(long id) {
-        String sqlQuery = "DELETE FROM mpa WHERE mpa_id = ?";
-        jdbcTemplate.update(sqlQuery, id);
-    }
-
-    @Override
     public Mpa getMpaByFilm(long filmId) {
         String sqlQuery = "SELECT * FROM mpa WHERE mpa_id IN (SELECT mpa_id FROM films WHERE film_id = ?)";
         try {

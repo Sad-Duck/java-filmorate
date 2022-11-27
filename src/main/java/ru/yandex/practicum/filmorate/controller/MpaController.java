@@ -30,10 +30,4 @@ public class MpaController {
         return service.getAll();
     }
 
-    @GetMapping("/film/{filmId}")
-    public Mpa getMpaByFilm(@PathVariable long filmId) {
-        log.info("Получен запрос рейтинга MPA для фильма с id: {}", filmId);
-        return service.getMpaByFilm(filmId);
-    }
-
 }

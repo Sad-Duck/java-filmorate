@@ -38,27 +38,6 @@ public class GenreDbStorage implements GenreStorage {
         return jdbcTemplate.query(sqlQuery, GenreDbStorage::makeGenre);
     }
 
-    public Genre create(Genre data) {
-        String sqlQuery = "INSERT INTO genres(genre) " +
-                "VALUES (?)";
-        jdbcTemplate.update(sqlQuery,
-                data.getName());
-        return data;
-    }
-
-    public void delete(long id) {
-        String sqlQuery = "DELETE FROM genres WHERE genre_id = ?";
-        jdbcTemplate.update(sqlQuery, id);
-    }
-
-    @Override
-    public Genre update(Genre data) {
-        String sql = "UPDATE genres SET genre = ? WHERE genre_id = ?";
-        jdbcTemplate.update(sql,
-                data.getName(), data.getId());
-        return data;
-    }
-
     @Override
     public List<Genre> getGenresByFilm(long filmId) {
         String sqlQuery = "SELECT * FROM genres WHERE GENRE_ID IN (SELECT GENRE_ID FROM FILM_GENRES WHERE FILM_ID = ?)";

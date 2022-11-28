@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotValidException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -22,7 +21,7 @@ public class FilmService {
     private final MpaService mpaService;
 
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage storage,
+    public FilmService(FilmStorage storage,
                        UserService userService,
                        GenreService genreService,
                        MpaService mpaService) {

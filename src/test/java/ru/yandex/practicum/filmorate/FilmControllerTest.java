@@ -9,7 +9,6 @@ import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class FilmControllerTest {
 
     private final FilmDbStorage filmStorage;
-    private final GenreDbStorage genreStorage;
 
     @Test
     public void createFilmTest() {
@@ -125,14 +123,5 @@ public class FilmControllerTest {
         List<Film> topFilms = filmStorage.getFilmsTop(1);
 
         assertEquals("testFilmOne", topFilms.get(0).getName());
-    }
-
-    @Test
-    public void testGetFilmsByGenre() {
-        genreStorage.addFilmGenre(1, 2);
-        genreStorage.addFilmGenre(2, 1);
-        List<Film> filmsByGenreTest = filmStorage.getFilmsByGenre(2);
-
-        assertEquals("testFilmOne", filmsByGenreTest.get(0).getName());
     }
 }

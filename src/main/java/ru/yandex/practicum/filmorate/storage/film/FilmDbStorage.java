@@ -101,10 +101,4 @@ public class FilmDbStorage implements FilmStorage {
                 "GROUP BY films.film_id ORDER BY COUNT(LIKES.user_id) DESC LIMIT ?";
         return jdbcTemplate.query(sqlQuery, ModelMapper::makeFilm, count);
     }
-
-    public List<Film> getFilmsByGenre(long genreId) {
-        String sqlQuery = "SELECT * FROM films WHERE film_id IN " +
-                "(SELECT film_id FROM FILM_GENRES WHERE genre_id = ?)";
-        return jdbcTemplate.query(sqlQuery, ModelMapper::makeFilm, genreId);
-    }
 }

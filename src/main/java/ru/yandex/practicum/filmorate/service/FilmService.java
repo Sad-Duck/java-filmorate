@@ -111,9 +111,4 @@ public class FilmService {
         films.forEach(film -> film.setMpa(mpaService.getMpaByFilm(film.getId())));
         return films;
     }
-
-    public List<Film> getByGenre(long genreId) {
-        return storage.getFilmsByGenre(genreId);
-    }
-
 }

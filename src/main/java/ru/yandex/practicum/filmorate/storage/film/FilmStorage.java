@@ -13,7 +13,4 @@ public interface FilmStorage extends Storage<Film> {
 
     List<Film> getFilmsTop(int count);
 
-    List<Film> getFilmsByGenre(long genreId);
-
-
 }

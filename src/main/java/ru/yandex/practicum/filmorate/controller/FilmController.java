@@ -69,10 +69,4 @@ public class FilmController {
         log.info("Получен запрос списка популярных фильмов. Размер - {}", count);
         return service.getPopular(count);
     }
-
-        @GetMapping("/genre")
-        public List<Film> getByGenre(long genreId) {
-            log.info("Получен запрос списка фильмов по жанру с id - {}", genreId);
-            return service.getByGenre(genreId);
-    }
 }

@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.Mpa.MpaDbStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaDbStorage;
 
 import java.util.List;
 import java.util.Optional;

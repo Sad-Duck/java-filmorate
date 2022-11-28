@@ -1,22 +1,4 @@
-DELETE FROM LIKES;
-
-DELETE FROM FRIENDS;
-
-DELETE FROM FILM_GENRES;
-
-DELETE FROM USERS;
-
-DELETE FROM FILMS;
-
-DELETE FROM MPA;
-
-DELETE FROM GENRES;
-
-ALTER TABLE USERS ALTER COLUMN user_id RESTART WITH 1;
-
-ALTER TABLE FILMS ALTER COLUMN film_id RESTART WITH 1;
-
-ALTER TABLE GENRES ALTER COLUMN genre_id RESTART WITH 1;
+Drop All Objects;
 
 create table IF NOT EXISTS GENRES
 (
@@ -85,9 +67,22 @@ create table IF NOT EXISTS LIKES
         foreign key (USER_ID) references USERS (USER_ID)
 );
 
-INSERT INTO PUBLIC.MPA (mpa_id, rating)
+INSERT INTO MPA (mpa_id, rating)
 VALUES (1, 'G'),
        (2, 'PG'),
        (3, 'PG-13'),
        (4, 'R'),
        (5, 'NC-17');
+
+INSERT INTO GENRES (genre)
+values ('testGenreOne'),
+    ('testGenreTwo');
+
+INSERT INTO USERS (EMAIL, LOGIN, NAME, BIRTHDAY)
+VALUES ('test@test.ru', 'testLogin', 'testUserOne', '2001-01-01'),
+       ('testTwo@test.ru', 'testLoginTwo', 'testUserTwo', '2002-02-02'),
+       ('testTwo@test.ru', 'testLoginThree', 'testUserThree', '2003-03-03');
+
+INSERT INTO FILMS (NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID, RATE)
+VALUES ('testFilmOne', 'testDescription', '2001-01-01', '100', '1', '0'),
+('testFilmTwo', 'testDescriptionTwo', '2002-02-02', '200', '3', '0');

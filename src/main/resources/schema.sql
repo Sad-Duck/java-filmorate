@@ -41,7 +41,7 @@ create table IF NOT EXISTS USERS
     EMAIL    VARCHAR,
     LOGIN    VARCHAR not null,
     NAME     VARCHAR not null,
-    BIRTHDAY DATE
+    BIRTHDAY DATE not null
 );
 
 create table IF NOT EXISTS FRIENDS

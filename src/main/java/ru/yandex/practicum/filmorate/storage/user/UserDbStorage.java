@@ -89,9 +89,11 @@ public class UserDbStorage implements UserStorage {
 
     public List<User> getMutualFriends(long id, long otherId) {
         String sqlQuery =
-                "SELECT * FROM USERS WHERE USER_ID IN " +
-                        "(SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? " +
-                        "AND FRIEND_ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?))";
+        "SELECT u.* FROM friends f " +
+                "INNER JOIN users u ON f.friend_id = u.user_id " +
+                "WHERE (f.user_id = ?) or (f.USER_ID = ?) " +
+                "GROUP BY friend_id " +
+                "HAVING COUNT(friend_id) >= 2";
         return jdbcTemplate.query(sqlQuery, ModelMapper::makeUser, id, otherId);
     }
 

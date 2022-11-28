@@ -6,9 +6,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.ModelMapper;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 @Component
@@ -25,7 +24,7 @@ public class MpaDbStorage implements MpaStorage {
     public Mpa get(long id) {
         String sqlQuery = "SELECT * FROM mpa WHERE mpa_id = ?";
         try {
-            return jdbcTemplate.queryForObject(sqlQuery, MpaDbStorage::makeMpa, id);
+            return jdbcTemplate.queryForObject(sqlQuery, ModelMapper::makeMpa, id);
         } catch (DataAccessException e) {
             throw new NotFoundException("указанный ID не существует");
         }
@@ -34,23 +33,16 @@ public class MpaDbStorage implements MpaStorage {
     @Override
     public List<Mpa> getAll() {
         String sqlQuery = "SELECT * FROM mpa ORDER BY MPA_ID";
-        return jdbcTemplate.query(sqlQuery, MpaDbStorage::makeMpa);
+        return jdbcTemplate.query(sqlQuery, ModelMapper::makeMpa);
     }
 
     @Override
     public Mpa getMpaByFilm(long filmId) {
         String sqlQuery = "SELECT * FROM MPA LEFT OUTER JOIN FILMS F ON MPA.MPA_ID = F.MPA_ID WHERE FILM_ID = ?";
         try {
-            return jdbcTemplate.queryForObject(sqlQuery, MpaDbStorage::makeMpa, filmId);
+            return jdbcTemplate.queryForObject(sqlQuery, ModelMapper::makeMpa, filmId);
         } catch (DataAccessException e) {
             throw new NotFoundException("Mpa для фильма не найден");
         }
     }
-
-    private static Mpa makeMpa(ResultSet rs, int rownum) throws SQLException {
-        long id = rs.getLong("MPA_ID");
-        String rating = rs.getString("RATING");
-        return new Mpa(id, rating);
-    }
-
 }

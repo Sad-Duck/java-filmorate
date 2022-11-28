@@ -8,12 +8,10 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.ModelMapper;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -69,7 +67,7 @@ public class FilmDbStorage implements FilmStorage {
     public Film get(long id) {
         String sqlQuery = "SELECT * FROM films WHERE film_id = ?";
         try {
-            return jdbcTemplate.queryForObject(sqlQuery, FilmDbStorage::makeFilm, id);
+            return jdbcTemplate.queryForObject(sqlQuery, ModelMapper::makeFilm, id);
         } catch (DataAccessException e) {
             throw new NotFoundException("указанный ID не найден");
         }
@@ -84,7 +82,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getAll() {
         String sql = "SELECT * FROM films";
-        return jdbcTemplate.query(sql, FilmDbStorage::makeFilm);
+        return jdbcTemplate.query(sql, ModelMapper::makeFilm);
     }
 
     public void addLike(long id, long userId) {
@@ -101,23 +99,12 @@ public class FilmDbStorage implements FilmStorage {
 
         String sqlQuery = "SELECT films.* FROM films LEFT JOIN likes ON films.film_id = likes.film_id " +
                 "GROUP BY films.film_id ORDER BY COUNT(LIKES.user_id) DESC LIMIT ?";
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, count);
+        return jdbcTemplate.query(sqlQuery, ModelMapper::makeFilm, count);
     }
 
     public List<Film> getFilmsByGenre(long genreId) {
         String sqlQuery = "SELECT * FROM films WHERE film_id IN " +
                 "(SELECT film_id FROM FILM_GENRES WHERE genre_id = ?)";
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::makeFilm, genreId);
+        return jdbcTemplate.query(sqlQuery, ModelMapper::makeFilm, genreId);
     }
-
-    private static Film makeFilm(ResultSet rs, int rownum) throws SQLException {
-        long id = rs.getLong("FILM_ID");
-        String name = rs.getString("NAME");
-        String description = rs.getString("DESCRIPTION");
-        int duration = rs.getInt("DURATION");
-        int rate = rs.getInt("RATE");
-        LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
-        return new Film(id, name, description, releaseDate, duration, rate);
-    }
-
 }

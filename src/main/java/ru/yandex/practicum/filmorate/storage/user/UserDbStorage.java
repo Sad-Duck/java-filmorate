@@ -7,12 +7,10 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.ModelMapper;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -60,7 +58,7 @@ public class UserDbStorage implements UserStorage {
     public User get(long id) {
         String sqlQuery = "SELECT * FROM USERS WHERE USER_ID = ?";
         try {
-            return jdbcTemplate.queryForObject(sqlQuery, UserDbStorage::makeUser, id);
+            return jdbcTemplate.queryForObject(sqlQuery, ModelMapper::makeUser, id);
         } catch (DataAccessException e) {
             throw new NotFoundException("указанный ID не существует");
         }
@@ -75,7 +73,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getAll() {
         String sql = "SELECT * FROM USERS";
-        return jdbcTemplate.query(sql, UserDbStorage::makeUser);
+        return jdbcTemplate.query(sql, ModelMapper::makeUser);
     }
 
     public void addToFriends(long id, long friendId) {
@@ -94,21 +92,12 @@ public class UserDbStorage implements UserStorage {
                 "SELECT * FROM USERS WHERE USER_ID IN " +
                         "(SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? " +
                         "AND FRIEND_ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?))";
-        return jdbcTemplate.query(sqlQuery, UserDbStorage::makeUser, id, otherId);
+        return jdbcTemplate.query(sqlQuery, ModelMapper::makeUser, id, otherId);
     }
 
     public List<User> getFriends(long id) {
         String sqlQuery = "SELECT * FROM users JOIN FRIENDS ON USERS.USER_ID = FRIENDS.FRIEND_ID " +
                 "WHERE FRIENDS.USER_ID = ?";
-        return jdbcTemplate.query(sqlQuery, UserDbStorage::makeUser, id);
-    }
-
-    private static User makeUser(ResultSet rs, int rownum) throws SQLException {
-        long id = rs.getLong("USER_ID");
-        String email = rs.getString("EMAIL");
-        String login = rs.getString("LOGIN");
-        String name = rs.getString("NAME");
-        LocalDate birthday = rs.getDate("BIRTHDAY").toLocalDate();
-        return new User(id, email, login, name, birthday);
+        return jdbcTemplate.query(sqlQuery, ModelMapper::makeUser, id);
     }
 }

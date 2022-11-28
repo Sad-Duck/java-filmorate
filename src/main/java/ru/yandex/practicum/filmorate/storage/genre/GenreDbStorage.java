@@ -6,10 +6,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.ModelMapper;
 
 import javax.persistence.EntityNotFoundException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 @Component
@@ -26,7 +25,7 @@ public class GenreDbStorage implements GenreStorage {
     public Genre get(long id) {
         String sqlQuery = "SELECT * FROM genres WHERE genre_id = ?";
         try {
-            return jdbcTemplate.queryForObject(sqlQuery, GenreDbStorage::makeGenre, id);
+            return jdbcTemplate.queryForObject(sqlQuery, ModelMapper::makeGenre, id);
         } catch (DataAccessException e) {
             throw new NotFoundException("указанный ID не существует");
         }
@@ -35,7 +34,7 @@ public class GenreDbStorage implements GenreStorage {
     @Override
     public List<Genre> getAll() {
         String sqlQuery = "SELECT * FROM genres";
-        return jdbcTemplate.query(sqlQuery, GenreDbStorage::makeGenre);
+        return jdbcTemplate.query(sqlQuery, ModelMapper::makeGenre);
     }
 
     @Override
@@ -44,7 +43,7 @@ public class GenreDbStorage implements GenreStorage {
                 "LEFT OUTER JOIN FILM_GENRES FG on GENRES.GENRE_ID = FG.GENRE_ID " +
                 "WHERE FILM_ID = ?";
         try {
-            return jdbcTemplate.query(sqlQuery, GenreDbStorage::makeGenre, filmId);
+            return jdbcTemplate.query(sqlQuery, ModelMapper::makeGenre, filmId);
         } catch (DataAccessException e) {
             throw new EntityNotFoundException("Указанный фильм не найден");
         }
@@ -61,11 +60,5 @@ public class GenreDbStorage implements GenreStorage {
     public void removeFilmGenre(long filmId, long genreId) {
         String sqlQuery = "DELETE FROM film_genres WHERE film_id = ? AND genre_id = ?";
         jdbcTemplate.update(sqlQuery, filmId, genreId);
-    }
-
-    private static Genre makeGenre(ResultSet rs, int rownum) throws SQLException {
-        long id = rs.getLong("GENRE_ID");
-        String name = rs.getString("GENRE");
-        return new Genre(id, name);
     }
 }

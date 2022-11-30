@@ -1,62 +1,127 @@
 package ru.yandex.practicum.filmorate;
 
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.BeforeEach;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exception.NotValidException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SpringBootTest
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:beforeTest.sql")
 public class FilmControllerTest {
-    private FilmController filmController;
-    private Film film;
 
-    @BeforeEach
-    public void BeforeEach() {
-        film = new Film();
-        filmController = new FilmController(new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage()));
-        film.setId(0L);
-        film.setName("testName");
-        film.setDescription("test description");
-        film.setReleaseDate(LocalDate.of(2000, 10, 10));
-        film.setDuration(120);
+    private final FilmDbStorage filmStorage;
+
+    @Test
+    public void createFilmTest() {
+
+        Film testFilmOne = new Film();
+        testFilmOne.setName("testCreateFilm");
+        testFilmOne.setDescription("testDescription");
+        testFilmOne.setReleaseDate(LocalDate.of(2004, 4, 4));
+        testFilmOne.setMpa(new Mpa(1L, "G"));
+        testFilmOne.setDuration(400);
+        testFilmOne.setRate(0);
+        filmStorage.create(testFilmOne);
+
+        Film film = filmStorage.get(3);
+        assertThat(Optional.of(film))
+                .isPresent()
+                .hasValueSatisfying(f ->
+                        assertThat(f)
+                                .hasFieldOrPropertyWithValue("name", "testCreateFilm")
+                                .hasFieldOrPropertyWithValue("description", "testDescription")
+                                .hasFieldOrPropertyWithValue("releaseDate", LocalDate.of(2004, 4, 4))
+                                .hasFieldOrPropertyWithValue("duration", 400)
+                                .hasFieldOrPropertyWithValue("rate", 0)
+                );
     }
 
     @Test
-    void shouldNotValidateWhenNameIsBlank() {
-        film.setName("");
-        Throwable thrown = assertThrows(NotValidException.class, () -> filmController.create(film));
-        assertEquals(thrown.getMessage(), "Имя фильма неверное");
+    void testRemoveFilm() {
+        filmStorage.delete(2);
+
+        List<Film> films = filmStorage.getAll();
+        assertEquals(films.size(), 1);
     }
 
     @Test
-    void shouldNotValidateWhenDescriptionIsLongerThan200() {
-        String longString = StringUtils.repeat("*", 201);
-        film.setDescription(longString);
-        Throwable thrown = assertThrows(NotValidException.class, () -> filmController.create(film));
-        assertEquals(thrown.getMessage(), "Описание слишком длинное");
+    void testUpdateFilm() {
+        Film film = filmStorage.get(1);
+        film.setName("testNameUpdated");
+        film.setMpa(new Mpa(1L, "G"));
+        filmStorage.update(film);
+
+        assertThat(Optional.of(film))
+                .isPresent()
+                .hasValueSatisfying(f ->
+                        assertThat(f)
+                                .hasFieldOrPropertyWithValue("name", "testNameUpdated")
+                                .hasFieldOrPropertyWithValue("description", "testDescription")
+                                .hasFieldOrPropertyWithValue("releaseDate", LocalDate.of(2001, 1, 1))
+                                .hasFieldOrPropertyWithValue("duration", 100)
+                                .hasFieldOrPropertyWithValue("rate", 0)
+                );
     }
 
     @Test
-    void shouldNotValidateWhenReleaseDateIsBeforeFirstFilm() {
-        film.setReleaseDate(LocalDate.of(1895, 12, 27));
-        Throwable thrown = assertThrows(NotValidException.class, () -> filmController.create(film));
-        assertEquals(thrown.getMessage(), "Дата выхода неверна");
+    public void testFindAllFilms() {
+        List<Film> films = filmStorage.getAll();
+        assertEquals(films.size(), 2);
     }
 
     @Test
-    void shouldNotValidateWhenDurationIsNegative() {
-        film.setDuration(-1);
-        Throwable thrown = assertThrows(NotValidException.class, () -> filmController.create(film));
-        assertEquals(thrown.getMessage(), "Продолжительность неверна");
+    public void testFindFilmById() {
+        Optional<Film> filmOptional = Optional.ofNullable(filmStorage.get(1));
+
+        assertThat(filmOptional)
+                .isPresent()
+                .hasValueSatisfying(user ->
+                        assertThat(user).hasFieldOrPropertyWithValue("id", 1L)
+                );
     }
 
+    @Test
+    public void testAddLike() {
+        filmStorage.addLike(1, 1);
+        filmStorage.addLike(1, 2);
+        filmStorage.addLike(1, 3);
+        filmStorage.addLike(2, 1);
+        List<Film> topFilms = filmStorage.getFilmsTop(2);
+
+        assertEquals("testFilmOne", topFilms.get(0).getName());
+    }
+
+    @Test
+    public void testRemoveLike() {
+        filmStorage.addLike(1, 1);
+        filmStorage.addLike(1, 2);
+        filmStorage.addLike(2, 1);
+        filmStorage.removeLike(1, 1);
+        filmStorage.removeLike(1, 2);
+        List<Film> topFilms = filmStorage.getFilmsTop(2);
+
+        assertEquals("testFilmTwo", topFilms.get(0).getName());
+    }
+
+    @Test
+    public void testGetFilmsTop() {
+        filmStorage.addLike(1, 1);
+        List<Film> topFilms = filmStorage.getFilmsTop(1);
+
+        assertEquals("testFilmOne", topFilms.get(0).getName());
+    }
 }

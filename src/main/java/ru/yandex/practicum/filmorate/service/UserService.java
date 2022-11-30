@@ -8,15 +8,12 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
     private final UserStorage userStorage;
-    private long counter = 0L;
 
     @Autowired
     public UserService(UserStorage userStorage) {
@@ -25,17 +22,15 @@ public class UserService {
 
     public User create(User user) {
         validate(user);
-        user.setId(++counter);
-        userStorage.create(user);
-        return user;
+        return userStorage.create(user);
     }
 
     public User update(User data) {
-        userStorage.get(data.getId());
-        data.setId(data.getId());
+        if (userStorage.get(data.getId()) == null) {
+            throw new NotFoundException("Пользователь не найден");
+        }
         validate(data);
-        userStorage.update(data);
-        return data;
+        return userStorage.update(data);
     }
 
     public List<User> getAll() {
@@ -54,50 +49,27 @@ public class UserService {
         if ((userStorage.get(userId)) == null || (userStorage.get(friendId)) == null) {
             throw new NotFoundException("Пользователь не найден");
         }
-        if (isCrossFriend(userId, friendId)) { //если пользователь userId уже есть в друзьях у friendId то добавляемся в подтвержденные друзья у обоих юзеров
-            userStorage.get(userId).getConfirmedFriendIds().add(friendId);
-            userStorage.get(friendId).getConfirmedFriendIds().add(userId);
-            userStorage.get(friendId).getNotConfirmedFriendIds().remove(userId);
-        } else {
-            userStorage.get(userId).getNotConfirmedFriendIds().add(friendId); // иначе добавляем в неподтвержденные
-        }
+        userStorage.addToFriends(friendId, userId);
+        //если какой-то пользователь оставил вам заявку в друзья, то он будет в списке ваших друзей, а вы в его — нет.
     }
 
     public void removeFriend(long userId, long friendId) {
         if ((userStorage.get(userId)) == null || (userStorage.get(friendId)) == null) {
             throw new NotFoundException("Пользователь не найден");
         }
-        if (userStorage.get(userId).getConfirmedFriendIds().contains(friendId) ||
-                userStorage.get(userId).getNotConfirmedFriendIds().contains(friendId)) { // проверяем есть ли friendId в одном из списков
-            if (isCrossFriend(userId, friendId)) { // если дружба подтвержденная то удаляем у userId и переносим в неподтвержденные у friendId
-                userStorage.get(userId).getConfirmedFriendIds().remove(friendId);
-                userStorage.get(friendId).getConfirmedFriendIds().remove(userId);
-                userStorage.get(friendId).getNotConfirmedFriendIds().add(userId);
-            } else {
-                userStorage.get(userId).getNotConfirmedFriendIds().remove(friendId); // иначе просто удаляем из списка неподтвержденных
-            }
-        } else {
-            throw new NotFoundException("Друг, которого требовалось удалить не обнаружен");
-        }
+        userStorage.removeFromFriends(userId, friendId);
     }
 
-    public ArrayList<User> getMutualFriends(long userId, long otherId) {
+    public List<User> getMutualFriends(long userId, long otherId) {
         if ((userStorage.get(userId)) == null || (userStorage.get(otherId)) == null) {
             throw new NotFoundException("Пользователь не найден");
         }
-        ArrayList<User> mutualFriends = new ArrayList<>();
-        for (Long friendId : userStorage.get(userId).getNotConfirmedFriendIds()) {
-            if (userStorage.get(otherId).getConfirmedFriendIds().contains(friendId)) {
-                mutualFriends.add(userStorage.get(friendId));
-            }
-        }
-        return mutualFriends;
-    } // метод проверит наличие общих друзей, только если они находятся в списке подтвержденных.
+        return userStorage.getMutualFriends(userId, otherId);
+    }
 
-    public Collection<User> findFriends(Long userId) {
-        return userStorage.getAll().stream().filter(p ->
-                userStorage.get(userId).getConfirmedFriendIds().contains(p.getId())).collect(Collectors.toList());
-    } // метод вернет только подтвержденных друзей.
+    public Collection<User> getFriends(Long userId) {
+        return userStorage.getFriends(userId);
+    }
 
     protected void validate(User user) {
         if (user.getEmail() == null) {
@@ -117,9 +89,4 @@ public class UserService {
             user.setName(user.getLogin());
         }
     }
-
-    private boolean isCrossFriend(long userId, long friendId) {
-        return userStorage.get(friendId).getNotConfirmedFriendIds().contains(userId); // если у friendId в списке неподтвержденных друзей есть userId - вернет true
-    }
-
 }

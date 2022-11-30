@@ -8,5 +8,5 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public abstract class StorageData {
-    private Long id;
+    protected Long id;
 }

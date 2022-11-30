@@ -32,7 +32,7 @@ public class ModelMapper {
 
     public static Genre makeGenre(ResultSet rs, int rownum) throws SQLException {
         long id = rs.getLong("GENRE_ID");
-        String name = rs.getString("GENRE");
+        String name = rs.getString("NAME");
         return new Genre(id, name);
     }
 
